@@ -35,93 +35,66 @@ in a network of web pages based on the structure of the links between them.
 
 ```
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 
-class BooleanRetrieval:
-    def __init__(self):
-        self.index = {}
-        self.documents_matrix = None
+def hits_algorithm(adjacency_matrix, max_iterations=100, tol=1.0e-6):
+    num_nodes = len(adjacency_matrix)
+    authority_scores = np.ones(num_nodes)
+    hub_scores = np.ones(num_nodes)
+    
+    for i in range(max_iterations):
+        # Authority update
+        new_authority_scores = np.dot(adjacency_matrix.T, hub_scores)
+        new_authority_scores /= np.linalg.norm(new_authority_scores, ord=2)  # Normalizing
+        
+        # Hub update
+        new_hub_scores = np.dot(adjacency_matrix, new_authority_scores)
+        new_hub_scores /= np.linalg.norm(new_hub_scores, ord=2)  # Normalizing
+        
+        # Check convergence
+        authority_diff = np.linalg.norm(new_authority_scores - authority_scores, ord=2)
+        hub_diff = np.linalg.norm(new_hub_scores - hub_scores, ord=2)
+        
+        if authority_diff < tol and hub_diff < tol:
+            break
+        
+        authority_scores = new_authority_scores
+        hub_scores = new_hub_scores
+    
+    return authority_scores, hub_scores
 
-    def index_document(self, doc_id, text):
-        terms = text.lower().split()
-        print("Document -", doc_id, terms)
+# Example adjacency matrix (replace this with your own data)
+# For simplicity, using a random adjacency matrix
+adj_matrix = np.array([
+    [0, 1, 1],
+    [1, 0, 0],
+    [1, 0, 0]
+])
 
-        for term in terms:
-            if term not in self.index:
-                self.index[term] = set()
-            self.index[term].add(doc_id)
+# Run HITS algorithm
+authority, hub = hits_algorithm(adj_matrix)
+for i in range(len(authority)):
+    print(f"Node {i}: Authority Score = {authority[i]:.4f}, Hub Score = {hub[i]:.4f}")
 
-    def create_documents_matrix(self, documents):
-        terms = list(self.index.keys())
-        num_docs = len(documents)
-        num_terms = len(terms)
+# bar chart of authority vs hub scores
 
-        self.documents_matrix = np.zeros((num_docs, num_terms), dtype=int)
-
-        for i, (doc_id, text) in enumerate(documents.items()):
-            doc_terms = text.lower().split()
-            for term in doc_terms:
-                if term in self.index:
-                    term_id = terms.index(term)
-                    self.documents_matrix[i, term_id] = 1
-
-    def print_documents_matrix_table(self):
-        df = pd.DataFrame(self.documents_matrix, columns=self.index.keys())
-        print(df)
-
-    def print_all_terms(self):
-        print("All terms in the documents:")
-        print(list(self.index.keys()))
-
-    def boolean_search(self, query):
-        query_terms = query.lower().split()
-        results = None
-
-        for term in query_terms:
-            doc_ids = self.index.get(term, set())
-            if results is None:
-                results = doc_ids.copy()
-            else:
-                if term.startswith('not'):
-                    results.difference_update(doc_ids)
-                elif term == 'or':
-                    results.update(doc_ids)
-                elif term == 'and':
-                    results.intersection_update(doc_ids)
-
-        return list(results) if results else []
-if __name__ == "__main__":
-    indexer = BooleanRetrieval()
-
-
-    documents = {
-        1: "Python is a programming language",
-        2: "Information retrieval deals with finding information",
-        3: "Boolean models are used in information retrieval"
-    }
-
-    for doc_id, text in documents.items():
-        indexer.index_document(doc_id, text)
-
-
-    indexer.create_documents_matrix(documents)
-    indexer.print_documents_matrix_table()
-
-
-    indexer.print_all_terms()
-
-
-    query1 = input("Enter your boolean query: ")
-    results = indexer.boolean_search(query1)
-    if results:
-        print(f"Results for '{query1}': {results}")
-    else:
-        print("No results found for the query.")
+nodes = np.arange(len(authority))
+bar_width = 0.35
+plt.figure(figsize=(8, 6))
+plt.bar(nodes - bar_width/2, authority, bar_width, label='Authority', color='blue')
+plt.bar(nodes + bar_width/2, hub, bar_width, label='Hub', color='green')
+plt.xlabel('Node')
+plt.ylabel('Scores')
+plt.title('Authority and Hub Scores for Each Node')
+plt.xticks(nodes, [f'Node {i}' for i in nodes])
+plt.legend()
+plt.tight_layout()
+plt.show()
 ```
 
 ### Output:
-![image](https://github.com/user-attachments/assets/72419387-cfc7-483c-bdb0-1daff3766dde)
+![image](https://github.com/user-attachments/assets/d8ad443b-b17a-4e8e-aca7-369f8449c0fd)
 
 
 ### Result:
-Implementation of Information Retrieval Using Boolean Model in Python is successfully completed
+Thus, Link Analysis using HITS Algorithm in Python is successfully implemented.
