@@ -11,7 +11,7 @@ in a network of web pages based on the structure of the links between them.
     <p>    a) Start with an initial set of authority and hub scores for each page.     
     <p>    b) Typically, initial scores are set to 1 or some random values.
   
-2. ***Construction of the Adjacency Matrix:***
+2. ***Construction of the Adjacency Matrix:***       
     <p>    a) The web graph is represented as an adjacency matrix where each row and column correspond to a web page, and the matrix elements denote the presence or absence of links between pages.
     <p>    b) If page A has a link to page B, the corresponding element in the adjacency matrix is set to 1; otherwise, it's set to 0.
 
