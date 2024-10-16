@@ -8,7 +8,7 @@ in a network of web pages based on the structure of the links between them.
 
 ### Procedure:
 1. ***Initialization:***
-    <p>    a) Start with an initial set of authority and hub scores for each page.
+    <p>    a) Start with an initial set of authority and hub scores for each page.     
     <p>    b) Typically, initial scores are set to 1 or some random values.
   
 2. ***Construction of the Adjacency Matrix:***
